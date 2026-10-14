@@ -3,23 +3,187 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>RoundMe</title>
+<title>RoundMe: meet the people around you</title>
+<meta name="description" content="RoundMe shows you who is nearby and lets you meet them on your terms. Locals, a swipe game, a live feed and chat. Coming soon to Android.">
+<meta name="theme-color" content="#b4441a">
+<meta property="og:title" content="RoundMe">
+<meta property="og:description" content="Meet the people around you.">
+<meta property="og:type" content="website">
+<!--
+  index.html: the RoundMe landing page, hosted by GitHub Pages at
+  https://roundme.darkmatterits.com (see the CNAME file). One self-contained
+  file: no external fonts, scripts or trackers.
+  KEEP IT TRUE: every claim here must match the app and legal/privacy.html.
+  When the Play listing exists, replace the "Coming soon" pill with the store link.
+-->
 <style>
-  :root { color-scheme: light dark; --fg: #1f1b18; --bg: #ffffff; --link: #b4441a; }
-  @media (prefers-color-scheme: dark) { :root { --fg: #f3ede8; --bg: #161312; --link: #ff9a6b; } }
-  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-  main { max-width: 720px; margin: 0 auto; padding: 48px 16px; }
-  a { color: var(--link); }
+  :root {
+    color-scheme: light dark;
+    --bg: #fbf7f3;
+    --surface: #ffffff;
+    --fg: #1f1b18;
+    --muted: #5d554f;
+    --accent: #b4441a;
+    --accent-fg: #ffffff;
+    --line: rgba(31, 27, 24, .12);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #161312;
+      --surface: #201b19;
+      --fg: #f3ede8;
+      --muted: #b3a89f;
+      --accent: #ff9a6b;
+      --accent-fg: #1a1210;
+      --line: rgba(243, 237, 232, .14);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  a { color: var(--accent); }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+
+  /* Top bar */
+  header { padding: 20px 0; }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .brand { font-weight: 800; font-size: 1.35rem; letter-spacing: -.02em; color: var(--fg); text-decoration: none; }
+  .brand span { color: var(--accent); }
+  nav { display: flex; gap: 20px; font-size: .95rem; }
+  nav a { color: var(--muted); text-decoration: none; }
+  nav a:hover { color: var(--accent); }
+
+  /* Hero */
+  .hero { padding: 56px 0 72px; }
+  .hero h1 {
+    margin: 0 0 16px;
+    font-size: clamp(2.4rem, 7vw, 4rem);
+    line-height: 1.05;
+    letter-spacing: -.03em;
+  }
+  .hero h1 em { font-style: normal; color: var(--accent); }
+  .hero p { max-width: 36rem; margin: 0 0 28px; font-size: 1.2rem; color: var(--muted); }
+  .pill {
+    display: inline-block;
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--accent-fg);
+    font-weight: 700;
+    font-size: .95rem;
+  }
+  .note { display: block; margin-top: 12px; font-size: .9rem; color: var(--muted); }
+
+  /* Sections */
+  section { padding: 56px 0; border-top: 1px solid var(--line); }
+  section h2 { margin: 0 0 8px; font-size: 1.8rem; letter-spacing: -.02em; }
+  .lead { margin: 0 0 32px; color: var(--muted); max-width: 40rem; }
+  .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .card {
+    padding: 22px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+  }
+  .card h3 { margin: 0 0 6px; font-size: 1.15rem; }
+  .card p { margin: 0; color: var(--muted); font-size: .98rem; }
+
+  /* Privacy list */
+  .checks { margin: 0; padding: 0; list-style: none; display: grid; gap: 14px; }
+  .checks li { padding-left: 32px; position: relative; }
+  .checks li::before {
+    content: "";
+    position: absolute; left: 0; top: .45em;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--accent);
+  }
+
+  /* Footer */
+  footer { padding: 40px 0 56px; border-top: 1px solid var(--line); color: var(--muted); font-size: .92rem; }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 28px; justify-content: space-between; }
+  footer nav { font-size: inherit; }
 </style>
 </head>
 <body>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="/">Round<span>Me</span></a>
+    <nav aria-label="Main">
+      <a href="#features">Features</a>
+      <a href="#privacy">Privacy</a>
+      <a href="/terms">Terms</a>
+    </nav>
+  </div>
+</header>
+
 <main>
-<h1>RoundMe</h1>
-<p>Meet people nearby.</p>
-<ul>
-<li><a href="/terms">Terms of Service</a></li>
-<li><a href="/privacy">Privacy Policy</a></li>
-</ul>
+  <div class="hero">
+    <div class="wrap">
+      <h1>Meet the people <em>around you.</em></h1>
+      <p>RoundMe shows you who is nearby and lets you meet them on your terms. Browse locals, play the swipe game, post to your area and chat when it clicks.</p>
+      <span class="pill">Coming soon to Google Play</span>
+      <span class="note">Android first. For people 18 and older.</span>
+    </div>
+  </div>
+
+  <section id="features">
+    <div class="wrap">
+      <h2>What you can do</h2>
+      <p class="lead">Everything is built around who is actually near you.</p>
+      <div class="grid">
+        <div class="card">
+          <h3>Locals</h3>
+          <p>See who is nearby, closest first, with profiles that show only what each person chooses to share.</p>
+        </div>
+        <div class="card">
+          <h3>Meet</h3>
+          <p>Swipe through people, match when the interest is mutual, and play the guessing game to break the ice.</p>
+        </div>
+        <div class="card">
+          <h3>Live Feed</h3>
+          <p>Post to the people around you. Reply and like. Posts stay up for 7 days, so the feed always feels fresh.</p>
+        </div>
+        <div class="card">
+          <h3>Chat</h3>
+          <p>Message your matches and friends. You decide who is allowed to start a conversation with you.</p>
+        </div>
+        <div class="card">
+          <h3>Friends</h3>
+          <p>Add the people you click with, and keep them close even when you are not in the same place.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="privacy">
+    <div class="wrap">
+      <h2>Built to keep you in control</h2>
+      <p class="lead">Meeting strangers should feel safe. These are not extras, they are how RoundMe works.</p>
+      <ul class="checks">
+        <li><strong>Your exact location stays private.</strong> Other people see your town and a rough distance, never where you are.</li>
+        <li><strong>You choose what your profile shows.</strong> Hidden details are not sent to anyone else.</li>
+        <li><strong>Block and report in a tap.</strong> Blocked people cannot see or contact you.</li>
+        <li><strong>Adults only.</strong> You confirm your birthday when you sign up, and RoundMe is for people 18 and older.</li>
+        <li><strong>No ads and no selling your data.</strong> Read the full <a href="/privacy">Privacy Policy</a>.</li>
+      </ul>
+    </div>
+  </section>
 </main>
+
+<footer>
+  <div class="wrap">
+    <div>&copy; 2026 Dark Matter ITS. Questions? <a href="mailto:traenknercody@gmail.com">traenknercody@gmail.com</a></div>
+    <nav aria-label="Legal">
+      <a href="/terms">Terms of Service</a>
+      <a href="/privacy">Privacy Policy</a>
+    </nav>
+  </div>
+</footer>
+
 </body>
 </html>
