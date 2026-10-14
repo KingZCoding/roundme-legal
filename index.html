@@ -5,37 +5,53 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RoundMe: meet the people around you</title>
 <meta name="description" content="RoundMe shows you who is nearby and lets you meet them on your terms. Locals, a swipe game, a live feed and chat. Coming soon to Android.">
-<meta name="theme-color" content="#b4441a">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#0d1730">
 <meta property="og:title" content="RoundMe">
 <meta property="og:description" content="Meet the people around you.">
 <meta property="og:type" content="website">
 <!--
   index.html: the RoundMe landing page, hosted by GitHub Pages at
   https://roundme.darkmatterits.com (see the CNAME file). One self-contained
-  file: no external fonts, scripts or trackers.
-  KEEP IT TRUE: every claim here must match the app and legal/privacy.html.
-  When the Play listing exists, replace the "Coming soon" pill with the store link.
+  file: no external fonts, scripts or trackers, and no JavaScript at all.
+
+  KEEP IT TRUE: every claim here must match the app and privacy.html.
+  When the Play listing exists, replace the "Coming soon" badge with the store link.
+
+  HERO ANIMATION (the .radar panel): pure CSS, one 12 second loop.
+    - rings ping outward from "you" every 4s (.ping)
+    - people fade in as the first ring reaches them (.dot, delay set by --d)
+    - a message from you, the other person typing, then their reply
+      (.msg-you, .typing, .msg-them; the percentages in the keyframes below
+      are positions inside the 12s loop)
+  The base styles are the FINAL still frame (people visible, both messages
+  shown). Animation is only switched on inside
+  @media (prefers-reduced-motion: no-preference), so people who ask their
+  device for less motion get the still frame.
+  The people and the messages are illustration, not real users or data.
 -->
 <style>
   :root {
     color-scheme: light dark;
-    --bg: #fbf7f3;
+    --bg: #faf9f7;
     --surface: #ffffff;
-    --fg: #1f1b18;
-    --muted: #5d554f;
-    --accent: #b4441a;
-    --accent-fg: #ffffff;
-    --line: rgba(31, 27, 24, .12);
+    --fg: #17191f;
+    --muted: #565c69;
+    --accent: #bf3a12;
+    --tile: rgba(191, 58, 18, .1);
+    --line: rgba(23, 25, 31, .12);
+    --night-1: #1d2f55;
+    --night-2: #0d1730;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #161312;
-      --surface: #201b19;
-      --fg: #f3ede8;
-      --muted: #b3a89f;
-      --accent: #ff9a6b;
-      --accent-fg: #1a1210;
-      --line: rgba(243, 237, 232, .14);
+      --bg: #0f1115;
+      --surface: #171a21;
+      --fg: #eef0f5;
+      --muted: #a3a9b8;
+      --accent: #ff8a5c;
+      --tile: rgba(255, 138, 92, .14);
+      --line: rgba(238, 240, 245, .12);
     }
   }
   * { box-sizing: border-box; }
@@ -43,57 +59,170 @@
     margin: 0;
     background: var(--bg);
     color: var(--fg);
-    font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font: 17px/1.6 ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   }
   a { color: var(--accent); }
-  .wrap { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
 
-  /* Top bar */
+  /* ---------- Top bar ---------- */
   header { padding: 20px 0; }
   header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-  .brand { font-weight: 800; font-size: 1.35rem; letter-spacing: -.02em; color: var(--fg); text-decoration: none; }
+  .brand { font-weight: 800; font-size: 1.35rem; letter-spacing: -.03em; color: var(--fg); text-decoration: none; }
   .brand span { color: var(--accent); }
   nav { display: flex; gap: 20px; font-size: .95rem; }
   nav a { color: var(--muted); text-decoration: none; }
   nav a:hover { color: var(--accent); }
 
-  /* Hero */
-  .hero { padding: 56px 0 72px; }
+  /* ---------- Hero ---------- */
+  .hero { padding: 32px 0 72px; }
+  .hero-grid { display: grid; gap: 40px; align-items: center; }
+  @media (min-width: 860px) {
+    .hero-grid { grid-template-columns: 1.05fr .95fr; gap: 56px; }
+  }
   .hero h1 {
-    margin: 0 0 16px;
-    font-size: clamp(2.4rem, 7vw, 4rem);
-    line-height: 1.05;
-    letter-spacing: -.03em;
+    margin: 0 0 18px;
+    font-size: clamp(2.6rem, 6.5vw, 4.6rem);
+    line-height: 1;
+    letter-spacing: -.045em;
+    font-weight: 800;
   }
-  .hero h1 em { font-style: normal; color: var(--accent); }
-  .hero p { max-width: 36rem; margin: 0 0 28px; font-size: 1.2rem; color: var(--muted); }
-  .pill {
-    display: inline-block;
-    padding: 10px 18px;
+  .hero-copy p { max-width: 30rem; margin: 0 0 28px; font-size: 1.2rem; color: var(--muted); }
+  .status {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 9px 16px;
+    border: 1.5px solid var(--accent);
     border-radius: 999px;
-    background: var(--accent);
-    color: var(--accent-fg);
-    font-weight: 700;
-    font-size: .95rem;
+    color: var(--accent);
+    font-weight: 700; font-size: .95rem;
   }
+  .status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
   .note { display: block; margin-top: 12px; font-size: .9rem; color: var(--muted); }
 
-  /* Sections */
-  section { padding: 56px 0; border-top: 1px solid var(--line); }
-  section h2 { margin: 0 0 8px; font-size: 1.8rem; letter-spacing: -.02em; }
+  /* ---------- Hero animation: the night map ---------- */
+  .radar {
+    position: relative;
+    width: 100%; max-width: 460px; aspect-ratio: 1;
+    margin: 0 auto;
+    border-radius: 28px;
+    overflow: hidden;
+    background: radial-gradient(120% 120% at 50% 40%, var(--night-1), var(--night-2));
+    border: 1px solid rgba(255, 255, 255, .08);
+  }
+  .radar svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  /* Everything that animates scales around its own centre. */
+  .ping, .halo, .dot { transform-box: fill-box; transform-origin: center; }
+  .ping { opacity: 0; }          /* still frame: no ping ring */
+  .halo { opacity: .25; }
+
+  .chip {
+    position: absolute; left: 16px; top: 16px;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .1);
+    color: #dbe4ff;
+    font-size: .82rem;
+  }
+  .chip b { width: 8px; height: 8px; border-radius: 50%; background: #3ec9b0; }
+
+  .bubble {
+    position: absolute; margin: 0;
+    padding: 9px 13px;
+    max-width: 56%;
+    border-radius: 16px;
+    font-size: .88rem; line-height: 1.35;
+  }
+  .msg-you  { right: 7%; top: 66%; background: #c8431a; color: #fff; border-bottom-right-radius: 5px; transform-origin: 100% 100%; }
+  .msg-them { left: 7%;  top: 15%; background: #fff; color: #17191f; border-bottom-left-radius: 5px; transform-origin: 0 100%; }
+  .typing   { left: 7%;  top: 15%; display: none; gap: 4px; padding: 13px 14px; background: #fff; border-bottom-left-radius: 5px; transform-origin: 0 100%; }
+  .typing i { display: block; width: 6px; height: 6px; border-radius: 50%; background: #8b93a7; }
+
+  @keyframes ping {
+    0%   { transform: scale(.06); opacity: .8; }
+    70%  { transform: scale(1);   opacity: 0; }
+    100% { transform: scale(1);   opacity: 0; }
+  }
+  @keyframes halo {
+    0%   { transform: scale(1);   opacity: .4; }
+    100% { transform: scale(2.4); opacity: 0; }
+  }
+  @keyframes dot {
+    0%   { opacity: 0; transform: scale(0); }
+    3%   { opacity: 1; transform: scale(1.3); }
+    5%   { opacity: 1; transform: scale(1); }
+    88%  { opacity: 1; transform: scale(1); }
+    95%  { opacity: 0; transform: scale(.6); }
+    100% { opacity: 0; transform: scale(0); }
+  }
+  @keyframes msgYou {
+    0%, 24% { opacity: 0; transform: translateY(6px) scale(.85); }
+    28%, 80% { opacity: 1; transform: none; }
+    86%, 100% { opacity: 0; transform: translateY(-4px) scale(.95); }
+  }
+  @keyframes typing {
+    0%, 40% { opacity: 0; transform: scale(.85); }
+    43%, 50% { opacity: 1; transform: none; }
+    52%, 100% { opacity: 0; transform: none; }
+  }
+  @keyframes msgThem {
+    0%, 52% { opacity: 0; transform: translateY(6px) scale(.85); }
+    55%, 80% { opacity: 1; transform: none; }
+    86%, 100% { opacity: 0; transform: translateY(-4px) scale(.95); }
+  }
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-4px); }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+    .ping { animation: ping 4s ease-out infinite; }
+    .ping.p2 { animation-delay: 2s; }
+    .halo { animation: halo 2s ease-out infinite; }
+    .dot { animation: dot 12s var(--d, 0s) infinite both; }
+    .msg-you { animation: msgYou 12s infinite both; }
+    .typing { display: flex; animation: typing 12s infinite both; }
+    .msg-them { animation: msgThem 12s infinite both; }
+    .typing i { animation: bounce 1s ease-in-out infinite; }
+    .typing i:nth-child(2) { animation-delay: .15s; }
+    .typing i:nth-child(3) { animation-delay: .3s; }
+  }
+
+  /* ---------- Sections ---------- */
+  section { padding: 64px 0; border-top: 1px solid var(--line); }
+  section h2 { margin: 0 0 8px; font-size: 1.9rem; letter-spacing: -.03em; }
   .lead { margin: 0 0 32px; color: var(--muted); max-width: 40rem; }
-  .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+
+  /* Six-column grid: Locals and Meet are the core, so they get the wide cards. */
+  .grid { display: grid; gap: 16px; grid-template-columns: repeat(6, 1fr); }
   .card {
-    padding: 22px;
+    grid-column: span 2;
+    padding: 24px;
     background: var(--surface);
     border: 1px solid var(--line);
-    border-radius: 16px;
+    border-radius: 20px;
   }
-  .card h3 { margin: 0 0 6px; font-size: 1.15rem; }
+  .card.wide { grid-column: span 3; }
+  @media (max-width: 720px) {
+    .card, .card.wide { grid-column: 1 / -1; }
+  }
+  .icon {
+    display: grid; place-items: center;
+    width: 46px; height: 46px;
+    margin-bottom: 16px;
+    border-radius: 14px;
+    background: var(--tile);
+    color: var(--accent);
+  }
+  .icon svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .card h3 { margin: 0 0 6px; font-size: 1.15rem; letter-spacing: -.01em; }
+  .card.wide h3 { font-size: 1.3rem; }
   .card p { margin: 0; color: var(--muted); font-size: .98rem; }
 
   /* Privacy list */
-  .checks { margin: 0; padding: 0; list-style: none; display: grid; gap: 14px; }
+  .checks { margin: 0; padding: 0; list-style: none; display: grid; gap: 14px; max-width: 44rem; }
   .checks li { padding-left: 32px; position: relative; }
   .checks li::before {
     content: "";
@@ -102,10 +231,9 @@
     background: var(--accent);
   }
 
-  /* Footer */
+  /* ---------- Footer ---------- */
   footer { padding: 40px 0 56px; border-top: 1px solid var(--line); color: var(--muted); font-size: .92rem; }
   footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 28px; justify-content: space-between; }
-  footer nav { font-size: inherit; }
 </style>
 </head>
 <body>
@@ -123,11 +251,64 @@
 
 <main>
   <div class="hero">
-    <div class="wrap">
-      <h1>Meet the people <em>around you.</em></h1>
-      <p>RoundMe shows you who is nearby and lets you meet them on your terms. Browse locals, play the swipe game, post to your area and chat when it clicks.</p>
-      <span class="pill">Coming soon to Google Play</span>
-      <span class="note">Android first. For people 18 and older.</span>
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <h1>Meet the people around you.</h1>
+        <p>RoundMe shows you who is nearby and lets you meet them on your terms. Browse locals, play the swipe game, post to your area and chat when it clicks.</p>
+        <span class="status">Coming soon to Google Play</span>
+        <span class="note">Android first. For people 18 and older.</span>
+      </div>
+
+      <div class="radar" role="img" aria-label="Animation: people appear on a map around you as a ring spreads out, then you send a message and one of them replies.">
+        <svg viewBox="0 0 400 400" aria-hidden="true">
+          <defs>
+            <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+              <stop offset="0" stop-color="#ff6a3d" stop-opacity=".35"/>
+              <stop offset="1" stop-color="#ff6a3d" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+
+          <!-- Faint streets so it reads as a map. -->
+          <g fill="none" stroke="#ffffff" stroke-opacity=".07" stroke-width="10" stroke-linecap="round">
+            <path d="M-10 300 C 90 250 190 330 410 255"/>
+            <path d="M70 -10 C 110 120 60 250 120 410"/>
+            <path d="M-10 110 L 410 160"/>
+            <path d="M300 -10 C 280 140 340 260 310 410"/>
+          </g>
+          <g fill="none" stroke="#ffffff" stroke-opacity=".06" stroke-width="3" stroke-linecap="round">
+            <path d="M-10 205 L 410 220"/>
+            <path d="M190 -10 L 205 410"/>
+            <path d="M-10 40 C 120 70 260 30 410 70"/>
+          </g>
+
+          <!-- You are at the centre (200, 215). -->
+          <circle cx="200" cy="215" r="130" fill="url(#glow)"/>
+          <g fill="none" stroke="#9db4ff" stroke-opacity=".28" stroke-width="1.2">
+            <circle cx="200" cy="215" r="60"/>
+            <circle cx="200" cy="215" r="115"/>
+            <circle cx="200" cy="215" r="170" stroke-dasharray="3 6"/>
+          </g>
+          <circle class="ping" cx="200" cy="215" r="170" fill="none" stroke="#ff6a3d" stroke-width="2"/>
+          <circle class="ping p2" cx="200" cy="215" r="170" fill="none" stroke="#ff6a3d" stroke-width="2"/>
+
+          <!-- People nearby. --d is when each one appears (nearest first). -->
+          <g class="dot" style="--d:.6s"><circle cx="255" cy="175" r="16" fill="#3ec9b0" fill-opacity=".22"/><circle cx="255" cy="175" r="8" fill="#3ec9b0"/></g>
+          <g class="dot" style="--d:1.2s"><circle cx="310" cy="235" r="16" fill="#ffc857" fill-opacity=".22"/><circle cx="310" cy="235" r="8" fill="#ffc857"/></g>
+          <g class="dot" style="--d:1.5s"><circle cx="110" cy="135" r="16" fill="#ff8fab" fill-opacity=".22"/><circle cx="110" cy="135" r="8" fill="#ff8fab"/></g>
+          <g class="dot" style="--d:1.6s"><circle cx="95" cy="285" r="16" fill="#a78bfa" fill-opacity=".22"/><circle cx="95" cy="285" r="8" fill="#a78bfa"/></g>
+          <g class="dot" style="--d:1.8s"><circle cx="165" cy="345" r="16" fill="#7ee081" fill-opacity=".22"/><circle cx="165" cy="345" r="8" fill="#7ee081"/></g>
+          <g class="dot" style="--d:2s"><circle cx="305" cy="95" r="16" fill="#6bb7ff" fill-opacity=".22"/><circle cx="305" cy="95" r="8" fill="#6bb7ff"/></g>
+
+          <!-- You. -->
+          <circle class="halo" cx="200" cy="215" r="14" fill="#ff6a3d"/>
+          <circle cx="200" cy="215" r="9" fill="#ff6a3d" stroke="#ffffff" stroke-width="3"/>
+        </svg>
+
+        <span class="chip"><b></b>Near you</span>
+        <div class="bubble msg-you">Hey, looks like we're close by.</div>
+        <div class="bubble typing"><i></i><i></i><i></i></div>
+        <div class="bubble msg-them">Ha, small world. Coffee?</div>
+      </div>
     </div>
   </div>
 
@@ -136,23 +317,28 @@
       <h2>What you can do</h2>
       <p class="lead">Everything is built around who is actually near you.</p>
       <div class="grid">
-        <div class="card">
+        <div class="card wide">
+          <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></svg></div>
           <h3>Locals</h3>
           <p>See who is nearby, closest first, with profiles that show only what each person chooses to share.</p>
         </div>
-        <div class="card">
+        <div class="card wide">
+          <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z"/></svg></div>
           <h3>Meet</h3>
           <p>Swipe through people, match when the interest is mutual, and play the guessing game to break the ice.</p>
         </div>
         <div class="card">
+          <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4.5" width="16" height="15" rx="3"/><path d="M8 9.5h8M8 13h8M8 16.2h4.5"/></svg></div>
           <h3>Live Feed</h3>
           <p>Post to the people around you. Reply and like. Posts stay up for 7 days, so the feed always feels fresh.</p>
         </div>
         <div class="card">
+          <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3h-4.5L8 19.5V16a3 3 0 0 1-3-3z"/></svg></div>
           <h3>Chat</h3>
           <p>Message your matches and friends. You decide who is allowed to start a conversation with you.</p>
         </div>
         <div class="card">
+          <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8.5" r="3"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9.5" r="2.4"/><path d="M16 14.2a4.6 4.6 0 0 1 5 4.3"/></svg></div>
           <h3>Friends</h3>
           <p>Add the people you click with, and keep them close even when you are not in the same place.</p>
         </div>
