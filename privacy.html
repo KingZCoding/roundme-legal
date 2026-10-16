@@ -9,6 +9,9 @@
   "Write and host Terms of Service + Privacy Policy"). Update this file whenever
   the data collected changes, bump TERMS_VERSION in features/legal/legal.ts, and
   have a lawyer review before launch (this is not legal advice).
+  SECTION 5 (How long we keep it) must match the periods in the constants block of
+  private.run_retention_cleanup (supabase migration 20261016200000 and later). Change
+  both in the same commit, and keep the copy in the roundme-legal repo byte-identical.
   CONTACT EMAIL appears in several places: search for "traenknercody@gmail.com".
 -->
 <style>
@@ -28,7 +31,7 @@
 <body>
 <main>
 <h1>RoundMe Privacy Policy</h1>
-<p class="meta">Last updated: October 14, 2026</p>
+<p class="meta">Last updated: October 16, 2026</p>
 
 <p>RoundMe is a social app for meeting people nearby. It is run by Dark Matter ITS in New Jersey, USA ("we", "us"). This policy explains what we collect, why, who sees it, and the choices you have. RoundMe is for people 18 and older.</p>
 
@@ -39,7 +42,7 @@
 <tr><td>Birthday</td><td>Collected once, to check you are 18 or older. We calculate your age from it. Other people see only your age, never your birthday.</td></tr>
 <tr><td>Profile</td><td>Display name, gender, who you are looking for, bio, interests, your town, and the optional details you add: height, weight, relationship status, smoking, drinking and education. You choose which of these other people can see.</td></tr>
 <tr><td>Photos</td><td>Profile photos and photos you attach to posts. Location data embedded in a photo is removed before upload.</td></tr>
-<tr><td>Location</td><td>Your exact location, only while the app is open (never in the background), used to find people and posts near you. It is stored privately and never shown to other people. They see only your town and a rough distance such as "within 5 miles". A post you make remembers where it was made, in the same private way.</td></tr>
+<tr><td>Location</td><td>Your location, only while the app is open (never in the background), used to find people and posts near you. Before we store it, we round it to the middle of a square about a quarter of a mile across, so we never keep your exact position. It is stored privately and never shown to other people. They see only your town and a rough distance such as "within 5 miles". A post you make remembers where it was made (also rounded), in the same private way.</td></tr>
 <tr><td>Content and activity</td><td>Posts, replies, likes, chat messages, friend requests, swipes, matches and guesses in the Meet game, people you block, and reports you file.</td></tr>
 <tr><td>Device and notifications</td><td>A push-notification token for your phone and basic device information, so we can send notifications you have allowed.</td></tr>
 <tr><td>Technical data</td><td>Our hosting provider keeps standard server logs (such as IP address and request times) for security and troubleshooting.</td></tr>
@@ -71,10 +74,22 @@
 <p>These companies may only use your information to provide their service to us. We may also share information when the law requires it, to respond to valid legal requests, or to protect someone's safety.</p>
 
 <h2>5. How long we keep it</h2>
+<p>Your information stays while your account is active, with the exceptions in this table. A daily cleanup job removes these items automatically.</p>
+<table>
+<tr><th>What</th><th>How long</th></tr>
+<tr><td>Your stored location</td><td>Cleared after 30 days without you opening the app. It is stored again the next time you open it. Your town stays on your profile.</td></tr>
+<tr><td>Records of location updates we ignored (for example, one that implied impossible travel speed)</td><td>30 days</td></tr>
+<tr><td>Meet game rounds and guesses</td><td>30 days after the round ends</td></tr>
+<tr><td>Notifications</td><td>90 days (friend requests stay while they are waiting for an answer)</td></tr>
+<tr><td>Reports we reviewed and dismissed, and our record of that decision</td><td>12 months after the decision</td></tr>
+<tr><td>Reports that led to action, and our other moderation records (for example, a suspension)</td><td>3 years after the decision or the record</td></tr>
+</table>
+<p>A report still being reviewed is kept until we decide it. We may keep a report longer if it involves a serious safety concern or a legal request.</p>
 <ul>
-<li>Your information stays while your account is active.</li>
+<li><strong>Posts</strong> stay until you delete them or delete your account. A post you delete disappears from the app, but its text may stay in our database until your account is deleted.</li>
+<li><strong>Messages</strong> stay until an account in the conversation is deleted. Deleting a conversation in the app only hides it for you; the other person still sees it, and we still keep it. When either person deletes their account, the whole conversation is deleted for both.</li>
 <li>When you delete your account in <em>Settings &gt; Delete account</em>, your profile, photos, posts, messages and activity are deleted. Copies may remain in backups for a limited time before they expire.</li>
-<li><strong>Reports are kept after an account is deleted</strong>, including a record of what was reported, so we can protect other people and respond to abuse.</li>
+<li><strong>Reports and moderation records are kept after an account is deleted</strong>, for the times above, including a record of what was reported, so we can protect other people and respond to abuse.</li>
 </ul>
 
 <h2>6. Your choices</h2>
