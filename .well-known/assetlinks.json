@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.darkmatterits.roundme",
+      "sha256_cert_fingerprints": [
+        "70:A4:27:85:C2:45:5D:35:8B:14:17:5D:F7:1C:89:51:97:68:89:86:A2:87:A5:1C:AB:64:8E:0D:00:D3:63:C2"
+      ]
+    }
+  }
+]

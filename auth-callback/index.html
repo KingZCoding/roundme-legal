@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open this link in RoundMe</title>
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="light dark">
+<!--
+  auth-callback/index.html: what a browser shows at
+  https://roundme.darkmatterits.com/auth-callback
+
+  Emailed sign-in links (confirm email, reset password) point here. On an
+  Android phone with RoundMe installed, Android hands the link straight to the
+  app and this page is never shown: that is the "App Link", verified by
+  /.well-known/assetlinks.json. This page appears only when the link is opened
+  somewhere else (a computer, a phone without the app).
+
+  It does nothing with the link: no scripts, no trackers. The one-time code in
+  the address is useless without the secret kept inside the app.
+
+  Keep the path in sync with the app: features/auth/authLinks.ts and
+  app.json android.intentFilters.
+-->
+<style>
+  :root { color-scheme: light dark; --bg: #faf9f7; --fg: #17191f; --muted: #565c69; --accent: #bf3a12; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0f1115; --fg: #eef0f5; --muted: #a3a9b8; --accent: #ff8a5c; }
+  }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 17px/1.6 ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 560px; margin: 0 auto; padding: 64px 20px; }
+  h1 { font-size: 1.6rem; letter-spacing: -.02em; margin: 0 0 16px; }
+  p { color: var(--muted); }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Open this link on your phone</h1>
+  <p>This link signs you in to RoundMe, so it has to be opened on the phone where you use the app.</p>
+  <p>If you are on that phone and the app did not open, make sure RoundMe is installed and up to date, then tap the link in your email again. If you were confirming your email, you can also just log in.</p>
+  <p><a href="/">Back to RoundMe</a></p>
+</main>
+</body>
+</html>
